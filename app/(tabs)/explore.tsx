@@ -1,5 +1,5 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Modal,
   Platform,
@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CarpoolCard } from '@/components/CarpoolCard';
 import { Card } from '@/components/ui/card';
+import { getSupabaseClient } from '@/context/supabase';
 
 export default function ExploreScreen() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -38,8 +39,35 @@ export default function ExploreScreen() {
     setMode('date');
     setShowPicker(true);
   };
-
   const isToday = selectedDate.toDateString() === new Date().toDateString();
+
+  const supabase = getSupabaseClient();
+  const [error, setError] = useState(null);
+  const [carpools, setCarpools] = useState(null);
+
+  useEffect(() => {
+    const fetchCarpools = async () => {
+      const { data, error } = await supabase
+        .from('rides')
+        .select()
+
+      if (error) {
+        setError('something went wrong while fetching carpools');
+        setCarpools(null);
+        console.error(error);
+      }
+      if (data) {
+        setCarpools(data);
+        setError(null);
+      }
+    }
+    fetchCarpools();
+  }, []);   
+  
+    const formatRideDate = (isoString: string) => {
+    const date = new Date(isoString);
+    return `${date.toLocaleDateString('nl-NL', { weekday: 'long', month: 'long', day: 'numeric' })} ${date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}`;
+  };
 
   return (
     <SafeAreaView className='flex-1'>
@@ -68,7 +96,7 @@ export default function ExploreScreen() {
 
           {/* Date Selection - Direct under search without padding/margin */}
           <Pressable
-            onPress={showDatePicker}
+          onPress={showDatePicker}
             className='bg-white border border-gray-300 rounded-xl p-4 flex-row items-center justify-between active:bg-gray-50 my-4'
           >
             <View className='flex-row items-center'>
@@ -151,17 +179,29 @@ export default function ExploreScreen() {
             )}
 
             {/* Cards voorbeeld */}
-            <View className='mt-5'>
-              <CarpoolCard
-                time={''} 
-                startLocation={'Assen'}
-                endLocation={'groningen'}
-                avatar={'image'}
-              />
-            </View>
+            {error && (<p>{ error }</p>)}
+            {carpools && (
+              <View>
+                {carpools.map(carpool => {
+                  const start_location = JSON.parse(carpool.start_location);
+                  const end_location = JSON.parse(carpool.end_location);
+                  return (
+                    <View className="mt-5" key={carpool.id}>
+                      <CarpoolCard
+                        key={carpool.id}
+                        time={formatRideDate(carpool.date)} 
+                        startLocation={start_location.city}
+                        endLocation={end_location.city}
+                        avatar={'image'}
+                      />
+                   </View>
+                  );
+                })}
+              </View>
+            )}
           </ScrollView>
         </Card>
       </View>
-    </SafeAreaView>
+    </SafeAreaView> 
   );
 }
