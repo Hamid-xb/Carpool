@@ -185,7 +185,8 @@ export default function ExploreScreen() {
                 {carpools.map(carpool => {
                   const start_location = JSON.parse(carpool.start_location);
                   const end_location = JSON.parse(carpool.end_location);
-                  return (
+                  if (carpool.date.slice(0,10) === selectedDate.toISOString().slice(0,10)) {
+                  return (                   
                     <View className="mt-5" key={carpool.id}>
                       <CarpoolCard
                         key={carpool.id}
@@ -195,8 +196,8 @@ export default function ExploreScreen() {
                         avatar={'image'}
                       />
                    </View>
-                  );
-                })}
+                  )
+                  }})}
               </View>
             )}
           </ScrollView>
