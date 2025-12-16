@@ -26,7 +26,7 @@ import {
 import { ChevronDownIcon } from '@/components/ui/icon';
 
 
-export default function Account() {
+export default function EditProfile() {
   const session = useSession();
   const devMode = process.env.EXPO_PUBLIC_DEV_MODE === 'true';
   const [loading, setLoading] = useState(true);

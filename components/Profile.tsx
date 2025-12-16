@@ -12,7 +12,7 @@ import { Input, InputField } from './ui/input';
 import { router } from 'expo-router';
 
 
-export default function EditProfile() {
+export default function Profile() {
     const session = useSession();
     const devMode = process.env.EXPO_PUBLIC_DEV_MODE === 'true';
     const userId = session.user?.id;
@@ -140,7 +140,7 @@ export default function EditProfile() {
                         <Text className="text-lg font-medium mb-3">{color || "-"}</Text>
                     </View>
 
-                    <Button onPress={() => router.push('/profile')}>
+                    <Button onPress={() => router.push('/editProfile')}>
                         <ButtonText>Ga naar Account</ButtonText>
                     </Button>
                 </View>
