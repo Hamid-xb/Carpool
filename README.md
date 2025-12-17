@@ -1,5 +1,6 @@
 # Carpool App
 
+Dit project is nog niet klaar
 Dit is de Carpool app project voor het faciliteren van het gebruiken van een carpool door Alfa-College medewerkers
 
 ## Get started
