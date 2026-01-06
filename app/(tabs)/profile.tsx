@@ -1,13 +1,13 @@
 import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Account from '@/components/Account';
+import Profile from "@/components/Profile";
 
 export default function ProfileScreen() {
-  return (
-    <SafeAreaView>
-      <ScrollView>
-        <Account />
-      </ScrollView>
-    </SafeAreaView>
-  );
+    return (
+        <SafeAreaView>
+            <ScrollView>
+                <Profile/>
+            </ScrollView>
+        </SafeAreaView>
+    );
 }

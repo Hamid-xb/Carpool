@@ -19,7 +19,7 @@ import { useSession } from '@/context/session-context';
 import { getUserCars } from '@/libs/getUserCars';
 import { getUserRides } from '@/libs/getUserRides';
 
-export default function drive() {
+export default function Drive() {
   const session = useSession();
   const userId = session.user.id;
 
