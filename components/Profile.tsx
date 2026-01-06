@@ -113,7 +113,7 @@ export default function Profile() {
                 <View className="w-full px-6">
                     <Text className="text-xl font-bold mb-4">Profile Information</Text>
 
-                    <View className="bg-white p-4 rounded-xl shadow-md space-y-2">
+                    <View className="bg-white p-4 rounded-xl shadow-md space-y-2 mb-2">
 
                         <Text className="text-base text-gray-600">Full Name</Text>
                         <Text className="text-lg font-medium mb-3">{fullName || "-"}</Text>
@@ -141,7 +141,7 @@ export default function Profile() {
                     </View>
 
                     <Button onPress={() => router.push('/editProfile')}>
-                        <ButtonText>Ga naar Account</ButtonText>
+                        <ButtonText> Profiel aanpassen</ButtonText>
                     </Button>
                 </View>
 

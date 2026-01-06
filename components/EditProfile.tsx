@@ -307,11 +307,7 @@ export default function EditProfile() {
         </Button>
       </View>
 
-        <View>
-
-        </View>
-
-      <View className={"ml-10"}>
+        <View className={"ml-10"}>
         <Button
             size="xl"
             action="negative"
