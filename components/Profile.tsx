@@ -1,16 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Alert, View, Text } from 'react-native';
+import { View, Text } from 'react-native';
 import { useSession } from '@/context/session-context';
-import { getSupabaseClient } from '@/context/supabase';
 import { getSingleRecord } from '@/libs/getSingleRecord';
 import { getUserCars } from '@/libs/getUserCars';
 import { showError } from '@/libs/showError';
-import { updateRecord } from '@/libs/updateRecord';
 import UserAvatar from './UserAvatar';
 import { Button, ButtonText } from './ui/button';
-import { Input, InputField } from './ui/input';
 import { router } from 'expo-router';
-
 
 export default function Profile() {
     const session = useSession();

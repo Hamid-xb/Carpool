@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import {Alert, ScrollView, View, SafeAreaView} from 'react-native';
+import {Alert, View, SafeAreaView} from 'react-native';
 import { useSession } from '@/context/session-context';
 import { getSupabaseClient } from '@/context/supabase';
 import { getSingleRecord } from '@/libs/getSingleRecord';
@@ -10,7 +10,6 @@ import { updateRecord } from '@/libs/updateRecord';
 import UserAvatar from './UserAvatar';
 import { Button, ButtonText } from './ui/button';
 import { Input, InputField } from './ui/input';
-import { router } from 'expo-router';
 
 
 import {
@@ -24,7 +23,6 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 import { ChevronDownIcon } from '@/components/ui/icon';
-
 
 export default function EditProfile() {
   const session = useSession();
@@ -306,7 +304,6 @@ export default function EditProfile() {
           <ButtonText>{loading ? 'Loading ...' : 'Update'}</ButtonText>
         </Button>
       </View>
-
         <View className={"ml-10"}>
         <Button
             size="xl"
