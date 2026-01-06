@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import {Alert, View, SafeAreaView} from 'react-native';
+import { Alert, View } from 'react-native';
 import { useSession } from '@/context/session-context';
 import { getSupabaseClient } from '@/context/supabase';
 import { getSingleRecord } from '@/libs/getSingleRecord';
@@ -11,20 +11,7 @@ import UserAvatar from './UserAvatar';
 import { Button, ButtonText } from './ui/button';
 import { Input, InputField } from './ui/input';
 
-
-import {
-  Select,
-  SelectTrigger,
-  SelectInput,
-  SelectIcon,
-  SelectPortal,
-  SelectBackdrop,
-  SelectContent,
-  SelectItem,
-} from '@/components/ui/select';
-import { ChevronDownIcon } from '@/components/ui/icon';
-
-export default function EditProfile() {
+export default function Account() {
   const session = useSession();
   const devMode = process.env.EXPO_PUBLIC_DEV_MODE === 'true';
   const [loading, setLoading] = useState(true);
@@ -208,18 +195,12 @@ export default function EditProfile() {
   ];
 
   return (
-      <SafeAreaView style={{ flex: 1 }}
-      >
-
-      <View className="justify-center items-center pb-10">
-        <UserAvatar
+    <View>
+      <UserAvatar
         size={200}
         url={avatarUrl}
         onUpload={(url: string) => handleAvatarUpload(url)}
-        disabled= {false}
-        showUploadButton={true}
       />
-      </View>
 
       <View className='mb-20'>
         {profile.map(({ isdisabled, placeholder, value, setter }, i) => (
@@ -233,81 +214,26 @@ export default function EditProfile() {
         ))}
       </View>
 
-      <View className='mb-6 space-y-2'>
-        {car.map(({ isdisabled, placeholder, value, setter }, i) => {
-          if (placeholder === 'Car Brand' || placeholder === 'Color') {
-            return (
-                <Select
-                    selectedValue={value !== null ? String(value) : null}
-                    onValueChange={(v) => setter(v)}
-                >
-                  <SelectTrigger
-                      variant='outline'
-                      size='md'
-                      className='bg-white rounded-md border border-gray-300 px-3 py-2'
-                  >
-                    <SelectInput placeholder={placeholder} />
-                    <SelectIcon className='mr-3' as={ChevronDownIcon} />
-                  </SelectTrigger>
-
-                  <SelectPortal>
-                    <SelectBackdrop />
-                    <SelectContent>
-                      {placeholder === 'Car Brand' ? (
-                          <>
-                            <SelectItem label='Toyota' value='Toyota' />
-                            <SelectItem label='BMW' value='BMW' />
-                            <SelectItem label='Tesla' value='Tesla' />
-                          </>
-                      ) : (
-                          <>
-                            <SelectItem label='Red' value='Red' />
-                            <SelectItem label='Blue' value='Blue' />
-                            <SelectItem label='Black' value='Black' />
-                          </>
-                      )}
-                    </SelectContent>
-                  </SelectPortal>
-                </Select>
-
-            );
-          } else {
-            return (
-                <Input
-                    key={i}
-                    variant='outline'
-                    size='md'
-                    isDisabled={isdisabled}
-                    className='bg-white rounded-md border border-gray-300 px-3 py-2'
-                >
-                  <InputField
-                      placeholder={placeholder}
-                      value={value}
-                      onChangeText={setter}
-                      editable={!isdisabled}
-                      keyboardType={placeholder === 'Seats' ? 'numeric' : 'default'}
-                      className='text-black'
-                  />
-                </Input>
-            );
-          }
-        })}
+      <View>
+        {car.map(({ isdisabled, placeholder, value, setter }, i) => (
+          <Input key={i} isDisabled={isdisabled}>
+            <InputField
+              placeholder={placeholder}
+              value={value}
+              onChangeText={setter}
+            />
+          </Input>
+        ))}
       </View>
 
-      <View className={"flex-row justify-center"}>
-      <View className={"mr-10"}>
-        <Button
-            size="xl"
-            action="positive"
-
-            onPress={updateProfile} disabled={loading}>
+      <View>
+        <Button onPress={updateProfile} disabled={loading}>
           <ButtonText>{loading ? 'Loading ...' : 'Update'}</ButtonText>
         </Button>
       </View>
-        <View className={"ml-10"}>
+
+      <View>
         <Button
-            size="xl"
-            action="negative"
           onPress={async () => {
             if (devMode) {
               console.log('[DEV MODE] Sign out skipped');
@@ -323,7 +249,6 @@ export default function EditProfile() {
           <ButtonText>Sign out</ButtonText>
         </Button>
       </View>
-      </View>
-      </SafeAreaView>
+    </View>
   );
 }
