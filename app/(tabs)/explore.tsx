@@ -48,17 +48,15 @@ export default function ExploreScreen() {
             />
           </View>
 
-          {/* Datum Prikker */}
+          {/* Datum Pikker */}
           <DatePickerField
             value={selectedDate}
             onChange={setSelectedDate}
           />
-          {/* Carpool Lijst */}
           <ScrollView>
-            {error && (<p>{ error }</p>)}
-            {carpools && (
-              <CarpoolList carpools={carpools} />
-            )}
+            {error && (<Text>{error}</Text>)}
+            
+            <CarpoolList />
           </ScrollView>
         </Card>
       </View>

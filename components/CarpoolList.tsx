@@ -10,7 +10,7 @@ type Carpool = {
   end_location: string;
 };
 
-export function CarpoolList({ carpools }: { carpools: any[] }) {
+export function CarpoolList() {
   const supabase = getSupabaseClient();
 
   const [carpools, setCarpools] = useState<Carpool[]>([]);
