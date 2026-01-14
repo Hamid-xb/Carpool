@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
-import {Alert, View, SafeAreaView} from 'react-native';
+import {
+  Alert,
+  View,
+  SafeAreaView,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform
+} from 'react-native';
 import { useSession } from '@/context/session-context';
 import { getSupabaseClient } from '@/context/supabase';
 import { getSingleRecord } from '@/libs/getSingleRecord';
@@ -10,7 +17,7 @@ import { updateRecord } from '@/libs/updateRecord';
 import UserAvatar from './UserAvatar';
 import { Button, ButtonText } from './ui/button';
 import { Input, InputField } from './ui/input';
-
+import { router } from "expo-router";
 
 import {
   Select,
@@ -49,10 +56,10 @@ export default function EditProfile() {
     postal_code: string;
   }
 
-  const userId = session.user.id;
+  const userId = session?.user?.id;
 
   useEffect(() => {
-    if (session.user) fetchUserData();
+    if (session?.user) fetchUserData();
   }, [session]);
 
   async function fetchUserData() {
@@ -60,7 +67,6 @@ export default function EditProfile() {
       setLoading(true);
 
       if (devMode) {
-        // Mock profile and car for dev mode
         setFullName('Development User');
         setPhone('+1234567890');
         setAvatarUrl('');
@@ -73,6 +79,8 @@ export default function EditProfile() {
         setColor('Red');
         return;
       }
+
+      if (!userId) return;
 
       const [profile, car] = await Promise.all([
         getSingleRecord<Profile>('profiles', userId),
@@ -127,16 +135,7 @@ export default function EditProfile() {
       setLoading(true);
 
       if (devMode) {
-        console.log('[DEV MODE] Profile updated:', {
-          fullName,
-          phone,
-          address,
-          postalCode,
-          brand,
-          model,
-          seats,
-          color,
-        });
+        console.log('[DEV MODE] Profile updated:', { fullName, phone, address, postalCode, brand, model, seats, color });
         Alert.alert('Profile updated! (dev mode)');
         return;
       }
@@ -174,156 +173,147 @@ export default function EditProfile() {
   };
 
   const profile = [
-    {
-      isdisabled: false,
-      placeholder: 'Full Name',
-      value: fullName,
-      setter: setFullName,
-    },
+    { isdisabled: false, placeholder: 'Full Name', value: fullName, setter: setFullName },
     { isdisabled: false, placeholder: 'Phone', value: phone, setter: setPhone },
-    {
-      isdisabled: false,
-      placeholder: 'Address',
-      value: address,
-      setter: setAddress,
-    },
-    {
-      isdisabled: false,
-      placeholder: 'Postal Code',
-      value: postalCode,
-      setter: setPostalCode,
-    },
+    { isdisabled: false, placeholder: 'Address', value: address, setter: setAddress },
+    { isdisabled: false, placeholder: 'Postal Code', value: postalCode, setter: setPostalCode },
   ];
 
   const car = [
-    {
-      isdisabled: false,
-      placeholder: 'Car Brand',
-      value: brand,
-      setter: setBrand,
-    },
+    { isdisabled: false, placeholder: 'Car Brand', value: brand, setter: setBrand },
+    // Note: These are set to disabled=true. Change to false if you want them editable.
     { isdisabled: true, placeholder: 'Model', value: model, setter: setModel },
     { isdisabled: true, placeholder: 'Color', value: color, setter: setColor },
     { isdisabled: true, placeholder: 'Seats', value: seats, setter: setSeats },
   ];
 
   return (
-      <SafeAreaView style={{ flex: 1 }}
-      >
-
-      <View className="justify-center items-center pb-10">
-        <UserAvatar
-        size={200}
-        url={avatarUrl}
-        onUpload={(url: string) => handleAvatarUpload(url)}
-        disabled= {false}
-        showUploadButton={true}
-      />
-      </View>
-
-      <View className='mb-20'>
-        {profile.map(({ isdisabled, placeholder, value, setter }, i) => (
-          <Input key={i} isDisabled={isdisabled}>
-            <InputField
-              placeholder={placeholder}
-              value={value}
-              onChangeText={setter}
-            />
-          </Input>
-        ))}
-      </View>
-
-      <View className='mb-6 space-y-2'>
-        {car.map(({ isdisabled, placeholder, value, setter }, i) => {
-          if (placeholder === 'Car Brand' || placeholder === 'Color') {
-            return (
-                <Select
-                    selectedValue={value !== null ? String(value) : null}
-                    onValueChange={(v) => setter(v)}
-                >
-                  <SelectTrigger
-                      variant='outline'
-                      size='md'
-                      className='bg-white rounded-md border border-gray-300 px-3 py-2'
-                  >
-                    <SelectInput placeholder={placeholder} />
-                    <SelectIcon className='mr-3' as={ChevronDownIcon} />
-                  </SelectTrigger>
-
-                  <SelectPortal>
-                    <SelectBackdrop />
-                    <SelectContent>
-                      {placeholder === 'Car Brand' ? (
-                          <>
-                            <SelectItem label='Toyota' value='Toyota' />
-                            <SelectItem label='BMW' value='BMW' />
-                            <SelectItem label='Tesla' value='Tesla' />
-                          </>
-                      ) : (
-                          <>
-                            <SelectItem label='Red' value='Red' />
-                            <SelectItem label='Blue' value='Blue' />
-                            <SelectItem label='Black' value='Black' />
-                          </>
-                      )}
-                    </SelectContent>
-                  </SelectPortal>
-                </Select>
-
-            );
-          } else {
-            return (
-                <Input
-                    key={i}
-                    variant='outline'
-                    size='md'
-                    isDisabled={isdisabled}
-                    className='bg-white rounded-md border border-gray-300 px-3 py-2'
-                >
-                  <InputField
-                      placeholder={placeholder}
-                      value={value}
-                      onChangeText={setter}
-                      editable={!isdisabled}
-                      keyboardType={placeholder === 'Seats' ? 'numeric' : 'default'}
-                      className='text-black'
-                  />
-                </Input>
-            );
-          }
-        })}
-      </View>
-
-      <View className={"flex-row justify-center"}>
-      <View className={"mr-10"}>
-        <Button
-            size="xl"
-            action="positive"
-
-            onPress={updateProfile} disabled={loading}>
-          <ButtonText>{loading ? 'Loading ...' : 'Update'}</ButtonText>
-        </Button>
-      </View>
-        <View className={"ml-10"}>
-        <Button
-            size="xl"
-            action="negative"
-          onPress={async () => {
-            if (devMode) {
-              console.log('[DEV MODE] Sign out skipped');
-              Alert.alert('Signed out! (dev mode)');
-              return;
-            }
-            const supabase = getSupabaseClient();
-            if (!supabase) return;
-
-            await supabase.auth.signOut();
-          }}
+      <SafeAreaView style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ flex: 1 }}
         >
-          <ButtonText>Sign out</ButtonText>
-        </Button>
-      </View>
-      </View>
+          <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+
+            <View className="justify-center items-center pb-10 pt-5">
+              <UserAvatar
+                  size={200}
+                  url={avatarUrl}
+                  onUpload={(url: string) => handleAvatarUpload(url)}
+                  disabled={false}
+                  showUploadButton={true}
+              />
+            </View>
+
+            <View className='mb-10 px-4'>
+              {profile.map(({ isdisabled, placeholder, value, setter }, i) => (
+                  <Input key={i} isDisabled={isdisabled} className="mb-4">
+                    <InputField
+                        placeholder={placeholder}
+                        value={value}
+                        onChangeText={setter}
+                    />
+                  </Input>
+              ))}
+            </View>
+
+            <View className='mb-6 space-y-2 px-4'>
+              {car.map(({ isdisabled, placeholder, value, setter }, i) => {
+                if (placeholder === 'Car Brand' || placeholder === 'Color') {
+                  return (
+                      <Select
+                          key={i}
+                          selectedValue={value !== null ? String(value) : ""}
+                          onValueChange={(v) => setter(v)}
+                      >
+                        <SelectTrigger
+                            variant='outline'
+                            size='md'
+                            className='bg-white rounded-md border border-gray-300 px-3 py-2 mb-2'
+                        >
+                          <SelectInput placeholder={placeholder} />
+                          <SelectIcon className='mr-3' as={ChevronDownIcon} />
+                        </SelectTrigger>
+
+                        <SelectPortal>
+                          <SelectBackdrop />
+                          <SelectContent>
+                            {placeholder === 'Car Brand' ? (
+                                <>
+                                  <SelectItem label='Toyota' value='Toyota' />
+                                  <SelectItem label='BMW' value='BMW' />
+                                  <SelectItem label='Tesla' value='Tesla' />
+                                </>
+                            ) : (
+                                <>
+                                  <SelectItem label='Red' value='Red' />
+                                  <SelectItem label='Blue' value='Blue' />
+                                  <SelectItem label='Black' value='Black' />
+                                </>
+                            )}
+                          </SelectContent>
+                        </SelectPortal>
+                      </Select>
+                  );
+                } else {
+                  return (
+                      <Input
+                          key={i}
+                          variant='outline'
+                          size='md'
+                          isDisabled={isdisabled}
+                          className='bg-white rounded-md border border-gray-300 px-3 py-2 mb-2'
+                      >
+                        <InputField
+                            placeholder={placeholder}
+                            // CRITICAL FIX: Convert numbers/null to string to prevent crash
+                            value={value !== null && value !== undefined ? String(value) : ''}
+                            onChangeText={setter}
+                            editable={!isdisabled}
+                            keyboardType={placeholder === 'Seats' ? 'numeric' : 'default'}
+                            className='text-black'
+                        />
+                      </Input>
+                  );
+                }
+              })}
+            </View>
+
+            <View className={"flex-row justify-center pb-10"}>
+              <View className={"mr-4"}>
+                <Button
+                    size="xl"
+                    action="positive"
+                    onPress={updateProfile}
+                    disabled={loading}
+                >
+                  <ButtonText>{loading ? 'Loading ...' : 'Update'}</ButtonText>
+                </Button>
+              </View>
+              <View className={"ml-4"}>
+                <Button
+                    size="xl"
+                    action="negative"
+                    onPress={async () => {
+                      if (devMode) {
+                        console.log('[DEV MODE] Sign out skipped');
+                        Alert.alert('Signed out! (dev mode)');
+                        return;
+                      }
+                      const supabase = getSupabaseClient();
+                      if (!supabase) return;
+
+                      await supabase.auth.signOut();
+                      router.replace('/');
+                    }}
+                >
+                  <ButtonText>Sign out</ButtonText>
+                </Button>
+              </View>
+            </View>
+
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
   );
 }
