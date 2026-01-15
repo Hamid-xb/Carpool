@@ -149,9 +149,8 @@ export default function drive() {
           ) : rides.length > 0 ? (
             <ScrollView className='p-3'>
               {rides.map((ride) => (
-                <View className='mt-5'>
+                <View className='mt-5' key={ride.id}>
                   <CarpoolCard
-                    key={ride.id}
                     time={formatRideDate(ride.dateTime)}
                     startLocation={ride.fromLocation}
                     endLocation={ride.toLocation}

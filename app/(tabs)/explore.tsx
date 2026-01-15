@@ -6,22 +6,17 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CarpoolCard } from '@/components/CarpoolCard';
 import { Card } from '@/components/ui/card';
-import { getSupabaseClient } from '@/context/supabase';
 import DatePickerField from '@/components/DatePickerField';
 import { CarpoolList } from '@/components/CarpoolList';
 
 export default function ExploreScreen() {
-  
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   const isToday = selectedDate.toDateString() === new Date().toDateString()
 
-  const supabase = getSupabaseClient();
   const [error, setError] = useState(null);
-  const [carpools, setCarpools] = useState(null);
 
   return (
     <SafeAreaView className='flex-1'>
@@ -55,8 +50,8 @@ export default function ExploreScreen() {
           />
           <ScrollView>
             {error && (<Text>{error}</Text>)}
-            
-            <CarpoolList />
+
+            <CarpoolList selectedDate={selectedDate} />
           </ScrollView>
         </Card>
       </View>
