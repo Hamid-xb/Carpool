@@ -7,15 +7,41 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card } from '@/components/ui/card';
-import DatePickerField from '@/components/DatePickerField';
 import { CarpoolList } from '@/components/CarpoolList';
+import DatePickerField from '@/components/DatePickerField';
+import { AutoCompleteLocation } from '@/components/AutoCompleteLocation';
 
 export default function ExploreScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  // Locatie zoekvelden
+  const [startLocation, setStartLocation] = useState<string>();
+  const [endLocation, setEndLocation] = useState<string>();
 
+  const handleLocationData = (
+    setter: React.Dispatch<React.SetStateAction<string>>,
+    feature: any,
+  ) => {
+    const { country, state, city, postcode, name, street, housenumber } =
+      feature;
+
+    const locationData = {
+      country,
+      state,
+      city,
+      postcode,
+      name,
+      street,
+      housenumber,
+      displayName: [name || street, housenumber].filter(Boolean).join(', '),
+    };
+
+    setter(JSON.stringify(locationData));
+  };
+
+  // tijdpikker
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const isToday = selectedDate.toDateString() === new Date().toDateString()
 
+  // Fout afhandeling
   const [error, setError] = useState(null);
 
   return (
@@ -33,14 +59,31 @@ export default function ExploreScreen() {
         {/* Main Card */}
         <Card className='flex-1 rounded-2xl shadow-lg bg-[#9ca3af] border-0 mx-4 mb-4'>
           {/* Zoeken functie */}
-          <View className='mb-0'>
-            <TextInput
-              placeholder='Zoeken...'
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              className='bg-white border border-gray-300 rounded-xl px-4 py-3 text-lg'
-              placeholderTextColor='#9CA3AF'
-            />
+          <View className='flex-row justify-between my-2 w-full'>
+            <View className='w-1/2 pr-2'>
+              <Text className='text-lg font-semibold text-gray-700 mb-2 py'>
+                Vertrekpunt
+              </Text>
+              <AutoCompleteLocation
+                value={startLocation ? JSON.parse(startLocation).displayName : ''}
+                onSelect={(feature) =>
+                  handleLocationData(setStartLocation, feature)
+                }
+                placeholder='Bijv. Groningen...'
+              />
+            </View>
+            <View className='w-1/2 pl-2'>
+              <Text className='text-lg font-semibold text-gray-700 mb-2'>
+                Bestemming
+              </Text>
+              <AutoCompleteLocation
+                value={endLocation ? JSON.parse(endLocation).displayName : ''}
+                onSelect={(feature) => 
+                  handleLocationData(setEndLocation, feature)
+                }
+                placeholder='Bijv. Assen...'
+              />
+            </View>
           </View>
 
           {/* Datum Pikker */}
@@ -51,6 +94,7 @@ export default function ExploreScreen() {
           <ScrollView>
             {error && (<Text>{error}</Text>)}
 
+            
             <CarpoolList selectedDate={selectedDate} />
           </ScrollView>
         </Card>

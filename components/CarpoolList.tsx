@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, Text } from 'react-native';
-import { CarpoolCard } from './CarpoolCard';
+import { ScrollView, Text, View } from 'react-native';
 import { useSession } from '@/context/session-context';
 import { getUserRides } from '@/libs/getUserRides';
+import { CarpoolCard } from './CarpoolCard';
 
 type Ride = {
   id: string;
@@ -11,9 +11,10 @@ type Ride = {
   fromLocation: string;
   dateTime: string;
 };
-  
+
 type Props = {
   selectedDate: Date;
+  sort: (a: Ride, b: Ride) => number;
 };
 
 export function CarpoolList({ selectedDate }: Props) {
@@ -60,23 +61,31 @@ export function CarpoolList({ selectedDate }: Props) {
   };
 
   useEffect(() => {
-  if (userId) {
-    fetchRidesData();
-  }
-}, [userId]);
+    if (userId) {
+      fetchRidesData();
+    }
+  }, [userId]);
 
-return (
+  return (
     <ScrollView>
       {loading && <Text>Loading...</Text>}
 
       {rides
+        .sort((a, b) => {
+          const dateA = new Date(`${a.dateTime}`).valueOf();
+          const dateB = new Date(`${b.dateTime}`).valueOf();
+          if (dateA > dateB) {
+            return -1; // return -1 here for DESC order
+          }
+          return 1; // return 1 here for DESC Order
+        })
         .filter(
-          ride =>
+          (ride) =>
             ride.dateTime.slice(0, 10) ===
-            selectedDate.toISOString().slice(0, 10)
+            selectedDate.toISOString().slice(0, 10),
         )
         .map((ride) => (
-          <View className="mt-5" key={ride.id}>
+          <View className='mt-5' key={ride.id}>
             <CarpoolCard
               time={formatRideDate(ride.dateTime)}
               startLocation={ride.fromLocation}
