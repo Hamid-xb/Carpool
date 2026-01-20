@@ -143,20 +143,19 @@ export default function CreateCarpool() {
           car_id: carId,
           start_location: startLocation,
           end_location: endLocation,
-          date: datetime,
+          date: datetime.toISOString(),
           seats_available: seats,
           updated_at: new Date(),
           preferences: JSON.stringify(selectedPreferences),
           ride_info: driveInfo,
         },
       });
-
       Alert.alert('Carpool created successfully!');
     } catch (error) {
       showError(error);
     } finally {
       setLoading(false);
-      router.push('/explore');
+      router.push('/drive');
     }
   };
 

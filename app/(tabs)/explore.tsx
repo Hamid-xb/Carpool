@@ -39,7 +39,7 @@ export default function ExploreScreen() {
 
   // tijdpikker
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const isToday = selectedDate.toDateString() === new Date().toDateString()
+  const isToday = selectedDate.toDateString() === new Date().toDateString();
 
   // Fout afhandeling
   const [error, setError] = useState(null);
