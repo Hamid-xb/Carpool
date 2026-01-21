@@ -5,7 +5,10 @@ import {
   SafeAreaView,
   ScrollView,
   KeyboardAvoidingView,
-  Platform
+  TouchableWithoutFeedback,
+  Platform,
+  Keyboard,
+  Text
 } from 'react-native';
 import { useSession } from '@/context/session-context';
 import { getSupabaseClient } from '@/context/supabase';
@@ -181,19 +184,20 @@ export default function EditProfile() {
 
   const car = [
     { isdisabled: false, placeholder: 'Car Brand', value: brand, setter: setBrand },
-    // Note: These are set to disabled=true. Change to false if you want them editable.
-    { isdisabled: true, placeholder: 'Model', value: model, setter: setModel },
-    { isdisabled: true, placeholder: 'Color', value: color, setter: setColor },
-    { isdisabled: true, placeholder: 'Seats', value: seats, setter: setSeats },
+    { isdisabled: false, placeholder: 'Model', value: model, setter: setModel },
+    { isdisabled: false, placeholder: 'Color', value: color, setter: setColor },
+    { isdisabled: false, placeholder: 'Seats', value: seats, setter: setSeats },
   ];
 
   return (
-      <SafeAreaView style={{ flex: 1 }}>
+
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1 }}
         >
-          <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+          <ScrollView contentContainerStyle={{ paddingBottom: 60}}>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View>
+
 
             <View className="justify-center items-center pb-10 pt-5">
               <UserAvatar
@@ -205,77 +209,85 @@ export default function EditProfile() {
               />
             </View>
 
-            <View className='mb-10 px-4'>
+            <View className='mb-6 space-y-2 px-4'>
               {profile.map(({ isdisabled, placeholder, value, setter }, i) => (
-                  <Input key={i} isDisabled={isdisabled} className="mb-4">
+                  <View key={i}>
+                  <Text>
+                    {placeholder}
+                  </Text>
+                <Input
+                    variant='outline'
+                    size='md'
+                    isDisabled={isdisabled}
+                    className='bg-white rounded-md border border-gray-300 px-3 py-2 mb-2'
+                >
                     <InputField
-                        placeholder={placeholder}
                         value={value}
                         onChangeText={setter}
                     />
                   </Input>
+
+                  </View>
               ))}
             </View>
 
             <View className='mb-6 space-y-2 px-4'>
               {car.map(({ isdisabled, placeholder, value, setter }, i) => {
-                if (placeholder === 'Car Brand' || placeholder === 'Color') {
+                if(placeholder != "Seats")
                   return (
-                      <Select
-                          key={i}
-                          selectedValue={value !== null ? String(value) : ""}
-                          onValueChange={(v) => setter(v)}
-                      >
-                        <SelectTrigger
-                            variant='outline'
-                            size='md'
-                            className='bg-white rounded-md border border-gray-300 px-3 py-2 mb-2'
-                        >
-                          <SelectInput placeholder={placeholder} />
-                          <SelectIcon className='mr-3' as={ChevronDownIcon} />
-                        </SelectTrigger>
-
-                        <SelectPortal>
-                          <SelectBackdrop />
-                          <SelectContent>
-                            {placeholder === 'Car Brand' ? (
-                                <>
-                                  <SelectItem label='Toyota' value='Toyota' />
-                                  <SelectItem label='BMW' value='BMW' />
-                                  <SelectItem label='Tesla' value='Tesla' />
-                                </>
-                            ) : (
-                                <>
-                                  <SelectItem label='Red' value='Red' />
-                                  <SelectItem label='Blue' value='Blue' />
-                                  <SelectItem label='Black' value='Black' />
-                                </>
-                            )}
-                          </SelectContent>
-                        </SelectPortal>
-                      </Select>
-                  );
-                } else {
-                  return (
+                      <View key={i}>
+                      <Text>
+                        {placeholder}
+                      </Text>
                       <Input
-                          key={i}
                           variant='outline'
                           size='md'
                           isDisabled={isdisabled}
                           className='bg-white rounded-md border border-gray-300 px-3 py-2 mb-2'
                       >
                         <InputField
-                            placeholder={placeholder}
-                            // CRITICAL FIX: Convert numbers/null to string to prevent crash
                             value={value !== null && value !== undefined ? String(value) : ''}
                             onChangeText={setter}
-                            editable={!isdisabled}
+                            editable={isdisabled}
                             keyboardType={placeholder === 'Seats' ? 'numeric' : 'default'}
                             className='text-black'
                         />
                       </Input>
+                      </View>
                   );
-                }
+                else
+                  return (
+                      <View key={i}>
+                        <Select
+                            selectedValue={value !== null ? String(value) : ""}
+                            onValueChange={(v) => setter(v)}
+                        >
+                          <SelectTrigger
+                              variant='outline'
+                              size='md'
+                              className='bg-white rounded-md border border-gray-300 px-3 py-2 mb-2'
+                          >
+                            <SelectInput placeholder={placeholder} />
+                            <SelectIcon className='mr-3' as={ChevronDownIcon} />
+                          </SelectTrigger>
+
+                          <SelectPortal>
+                            <SelectBackdrop />
+                            <SelectContent>
+                              {placeholder === 'Seats' ? (
+                                  <>
+                                    <SelectItem label='1' value='1' />
+                                    <SelectItem label='2' value='2' />
+                                    <SelectItem label='3' value='3' />
+                                  </>
+                              ) : (
+                                  <SelectItem label='Default Option' value='0' />
+                              )}
+                            </SelectContent>
+                          </SelectPortal>
+                        </Select>
+                      </View>
+                  );
               })}
             </View>
 
@@ -311,9 +323,10 @@ export default function EditProfile() {
                 </Button>
               </View>
             </View>
-
+            </View>
+          </TouchableWithoutFeedback>
           </ScrollView>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+
   );
 }

@@ -2,7 +2,8 @@ import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import '@/global.css';
 import { Stack } from 'expo-router';
 import { sessionContext } from '@/context/session-context';
-import {View} from 'react-native';
+import {View, Text} from 'react-native';
+
 
 import { useAuth } from '@/context/useAuth';
 
@@ -10,7 +11,7 @@ export default function RootLayout() {
     const { session, loading } = useAuth()
 
     if (loading) {
-        return <View>Loading...</View>;
+        return <View><Text> Loading... </Text></View>;
     }
 
     return (
