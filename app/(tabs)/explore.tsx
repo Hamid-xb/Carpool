@@ -13,36 +13,34 @@ import { AutoCompleteLocation } from '@/components/AutoCompleteLocation';
 
 export default function ExploreScreen() {
   // Locatie zoekvelden
-  const [startLocation, setStartLocation] = useState<string>();
-  const [endLocation, setEndLocation] = useState<string>();
+  const [startLocation, setStartLocation] = useState<any>(null);
+  const [endLocation, setEndLocation] = useState<any>(null);
 
-  const handleLocationData = (
-    setter: React.Dispatch<React.SetStateAction<string>>,
-    feature: any,
-  ) => {
-    const { country, state, city, postcode, name, street, housenumber } =
-      feature;
+  const handleLocationData = (setter: any, feature: any) => {
+    const { country, state, city, postcode, name, street, housenumber } = feature;
 
-    const locationData = {
+    setter({
       country,
       state,
       city,
       postcode,
-      name,
-      street,
-      housenumber,
       displayName: [name || street, housenumber].filter(Boolean).join(', '),
-    };
-
-    setter(JSON.stringify(locationData));
+    });
   };
-
   // tijdpikker
   const [selectedDate, setSelectedDate] = useState(new Date());
   const isToday = selectedDate.toDateString() === new Date().toDateString();
 
   // Fout afhandeling
   const [error, setError] = useState(null);
+
+  // filters resetten
+  function resetFilters() {
+    if ( startLocation !== null || endLocation !== null ) {
+      setStartLocation(null);
+      setEndLocation(null);
+    }
+  }
 
   return (
     <SafeAreaView className='flex-1'>
@@ -58,6 +56,15 @@ export default function ExploreScreen() {
 
         {/* Main Card */}
         <Card className='flex-1 rounded-2xl shadow-lg bg-[#9ca3af] border-0 mx-4 mb-4'>
+          {/*reset zoeken functie*/}
+          {(startLocation !== null || endLocation !== null) && (
+            <View className='px-4 pt-4 flex-row justify-end w-full'>
+              <Text className='text-blue-600 underline' onPress={resetFilters}>
+                Reset
+              </Text>
+            </View>
+          )}
+          
           {/* Zoeken functie */}
           <View className='flex-row justify-between my-2 w-full'>
             <View className='w-1/2 pr-2'>
@@ -65,9 +72,8 @@ export default function ExploreScreen() {
                 Vertrekpunt
               </Text>
               <AutoCompleteLocation
-                value={startLocation ? JSON.parse(startLocation).displayName : ''}
-                onSelect={(feature) =>
-                  handleLocationData(setStartLocation, feature)
+                value={startLocation?.displayName ?? ''}
+                onSelect={(feature) => handleLocationData(setStartLocation, feature)
                 }
                 placeholder='Bijv. Groningen...'
               />
@@ -77,7 +83,7 @@ export default function ExploreScreen() {
                 Bestemming
               </Text>
               <AutoCompleteLocation
-                value={endLocation ? JSON.parse(endLocation).displayName : ''}
+                value={endLocation?.displayName ?? ''}
                 onSelect={(feature) => 
                   handleLocationData(setEndLocation, feature)
                 }
@@ -91,12 +97,9 @@ export default function ExploreScreen() {
             value={selectedDate}
             onChange={setSelectedDate}
           />
-          <ScrollView>
-            {error && (<Text>{error}</Text>)}
+          {error && (<Text>{error}</Text>)}
 
-            
-            <CarpoolList selectedDate={selectedDate} />
-          </ScrollView>
+          <CarpoolList selectedDate={selectedDate} selectedStartLocation={startLocation} selectedEndLocation={endLocation} />
         </Card>
       </View>
     </SafeAreaView> 

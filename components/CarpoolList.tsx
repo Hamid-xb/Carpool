@@ -13,11 +13,15 @@ type Ride = {
 };
 
 type Props = {
+  // Filter functie voor carpool op basis van geselecteerde locatie
+  selectedStartLocation?: string;
+  selectedEndLocation?: string;
+
+  // Datum geselecteerd in de datumkiezer
   selectedDate: Date;
-  sort: (a: Ride, b: Ride) => number;
 };
 
-export function CarpoolList({ selectedDate }: Props) {
+export function CarpoolList({ selectedDate, selectedStartLocation, selectedEndLocation }: Props) {
   const [rides, setRides] = useState<Ride[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -31,14 +35,14 @@ export function CarpoolList({ selectedDate }: Props) {
 
       if (ridesData && ridesData.length > 0) {
         const processedRides = ridesData.map((ride) => {
+          const startLocation = JSON.parse(ride.start_location);
           const endLocation = JSON.parse(ride.end_location);
-          const StartLocation = JSON.parse(ride.start_location);
 
           return {
             id: ride.id,
             avatarUrl: ride.driver?.avatar_url,
+            fromLocation: startLocation.displayName,
             toLocation: endLocation.displayName,
-            fromLocation: StartLocation.displayName,
             dateTime: ride.date,
           };
         });
@@ -67,25 +71,27 @@ export function CarpoolList({ selectedDate }: Props) {
   }, [userId]);
 
   return (
-    <ScrollView>
+    <View>
       {loading && <Text>Loading...</Text>}
 
       {rides
-        .sort((a, b) => {
-          const dateA = new Date(`${a.dateTime}`).valueOf();
-          const dateB = new Date(`${b.dateTime}`).valueOf();
-          if (dateA > dateB) {
-            return -1; // return -1 here for DESC order
-          }
-          return 1; // return 1 here for DESC Order
+        .sort((a, b) => new Date(b.dateTime).valueOf() - new Date(a.dateTime).valueOf())
+        .filter((ride) => {
+          const sameDate =
+            ride.dateTime.slice(0, 10) === selectedDate.toISOString().slice(0, 10);
+
+          const sameStart =
+            !selectedStartLocation ||
+            ride.fromLocation === selectedStartLocation.displayName;
+
+          const sameEnd =
+            !selectedEndLocation ||
+            ride.toLocation === selectedEndLocation.displayName;
+
+          return sameDate && sameStart && sameEnd;
         })
-        .filter(
-          (ride) =>
-            ride.dateTime.slice(0, 10) ===
-            selectedDate.toISOString().slice(0, 10),
-        )
         .map((ride) => (
-          <View className='mt-5' key={ride.id}>
+          <View className="mt-5 bg-white" key={ride.id}>
             <CarpoolCard
               time={formatRideDate(ride.dateTime)}
               startLocation={ride.fromLocation}
@@ -93,7 +99,7 @@ export function CarpoolList({ selectedDate }: Props) {
               avatar={ride.avatarUrl}
             />
           </View>
-        ))}
-    </ScrollView>
+      ))}
+    </View>
   );
 }
