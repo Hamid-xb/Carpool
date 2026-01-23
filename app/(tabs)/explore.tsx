@@ -102,6 +102,6 @@ export default function ExploreScreen() {
           <CarpoolList selectedDate={selectedDate} selectedStartLocation={startLocation} selectedEndLocation={endLocation} />
         </Card>
       </View>
-    </SafeAreaView> 
+    </SafeAreaView>
   );
 }
