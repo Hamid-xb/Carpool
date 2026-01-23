@@ -148,16 +148,24 @@ export default function drive() {
             </View>
           ) : rides.length > 0 ? (
             <ScrollView className='p-3'>
-              {rides.map((ride) => (
-                <View className='mt-5'>
-                  <CarpoolCard
-                    key={ride.id}
-                    time={formatRideDate(ride.dateTime)}
-                    startLocation={ride.fromLocation}
-                    endLocation={ride.toLocation}
-                    avatar={ride.avatarUrl}
-                  />
-                </View>
+              {rides
+                .sort((a, b) => {
+                  const dateA = new Date(`${a.dateTime}`).valueOf();
+                  const dateB = new Date(`${b.dateTime}`).valueOf();
+                  if (dateA > dateB) {
+                    return -1; // return -1 here for DESC order
+                  }
+                  return 1; // return 1 here for DESC Order
+                })
+                .map((ride) => (
+                  <View className='mt-5' key={ride.id}>
+                    <CarpoolCard
+                      time={formatRideDate(ride.dateTime)}
+                      startLocation={ride.fromLocation}
+                      endLocation={ride.toLocation}
+                      avatar={ride.avatarUrl}
+                    />
+                  </View>
               ))}
             </ScrollView>
           ) : (

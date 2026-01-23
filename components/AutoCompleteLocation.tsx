@@ -30,6 +30,7 @@ interface PhotonAPIResponse {
 
 interface AutoCompleteLocationProps {
   placeholder?: string;
+  className?: string;
   minChars?: number;
   limit?: number;
   onSelect: (feature: PhotonFeature) => void;
@@ -172,37 +173,34 @@ export const AutoCompleteLocation: React.FC<AutoCompleteLocationProps> = ({
   };
 
   return (
-    <View className="w-full max-w-md self-center pt-10">
-      <Card className="relative w-full">
-        <Input className="w-full" onFocus={() => results.length > 0 && setOpen(true)}>
-          <InputSlot className="pl-3">
-            <InputIcon as={SearchIcon} />
-          </InputSlot>
-          <InputField
-            placeholder={placeholder}
-            value={query}
-            onChangeText={setQuery}
+    <View className="w-full ">
+      <Input className="w-full bg-white h-12 rounded-xl" onFocus={() => results.length > 0 && setOpen(true)}>
+        <InputSlot className="pl-3">
+          <InputIcon as={SearchIcon} />
+        </InputSlot>
+        <InputField
+          placeholder={placeholder}
+          value={query}
+          onChangeText={setQuery}
+        />
+      </Input>
+
+      {loading && (
+        <ActivityIndicator className="absolute right-3 top-3" size="small" />
+      )}
+
+      {open && results.length > 0 && (
+        <View className="absolute top-full left-0 right-0 mt-1 rounded-lg border border-gray-200 bg-white max-h-64 z-50 p-6">
+          <FlatList
+            keyboardShouldPersistTaps="handled"
+            data={results}
+            keyExtractor={(item, index) =>
+              `${item.properties.osm_id ?? index}-${index}`
+            }
+            renderItem={renderItem}
           />
-        </Input>
-
-        {loading && (
-          <ActivityIndicator className="absolute right-3 top-3" size="small" />
-        )}
-
-        {open && results.length > 0 && (
-          <View className="absolute top-full left-0 right-0 mt-1 rounded-lg border border-gray-200 bg-white max-h-64 z-50 p-6">
-            <FlatList
-              keyboardShouldPersistTaps="handled"
-              data={results}
-              keyExtractor={(item, index) =>
-                `${item.properties.osm_id ?? index}-${index}`
-              }
-              renderItem={renderItem}
-            />
-          </View>
-        )}
-      </Card>
+        </View>
+      )}
     </View>
-
   );
 };

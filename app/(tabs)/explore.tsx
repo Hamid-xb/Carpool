@@ -1,45 +1,46 @@
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  Modal,
-  Platform,
-  Pressable,
   ScrollView,
   Text,
   TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CarpoolCard } from '@/components/CarpoolCard';
 import { Card } from '@/components/ui/card';
+import { CarpoolList } from '@/components/CarpoolList';
+import DatePickerField from '@/components/DatePickerField';
+import { AutoCompleteLocation } from '@/components/AutoCompleteLocation';
 
 export default function ExploreScreen() {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [showPicker, setShowPicker] = useState(false);
-  const [mode, setMode] = useState<'date' | 'time'>('date');
-  const [searchQuery, setSearchQuery] = useState('');
+  // Locatie zoekvelden
+  const [startLocation, setStartLocation] = useState<any>(null);
+  const [endLocation, setEndLocation] = useState<any>(null);
 
-  const handleChange = (event: any, date?: Date) => {
-    if (event.type === 'dismissed') {
-      setShowPicker(false);
-      return;
-    }
+  const handleLocationData = (setter: any, feature: any) => {
+    const { country, state, city, postcode, name, street, housenumber } = feature;
 
-    if (date) {
-      setSelectedDate(date);
-    }
-
-    if (Platform.OS === 'android') {
-      setShowPicker(false);
-    }
+    setter({
+      country,
+      state,
+      city,
+      postcode,
+      displayName: [name || street, housenumber].filter(Boolean).join(', '),
+    });
   };
-
-  const showDatePicker = () => {
-    setMode('date');
-    setShowPicker(true);
-  };
-
+  // tijdpikker
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const isToday = selectedDate.toDateString() === new Date().toDateString();
+
+  // Fout afhandeling
+  const [error, setError] = useState(null);
+
+  // filters resetten
+  function resetFilters() {
+    if ( startLocation !== null || endLocation !== null ) {
+      setStartLocation(null);
+      setEndLocation(null);
+    }
+  }
 
   return (
     <SafeAreaView className='flex-1'>
@@ -55,111 +56,50 @@ export default function ExploreScreen() {
 
         {/* Main Card */}
         <Card className='flex-1 rounded-2xl shadow-lg bg-[#9ca3af] border-0 mx-4 mb-4'>
-          {/* Zoeken functie */}
-          <View className='mb-0'>
-            <TextInput
-              placeholder='Zoeken...'
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              className='bg-white border border-gray-300 rounded-xl px-4 py-3 text-lg'
-              placeholderTextColor='#9CA3AF'
-            />
-          </View>
-
-          {/* Date Selection - Direct under search without padding/margin */}
-          <Pressable
-            onPress={showDatePicker}
-            className='bg-white border border-gray-300 rounded-xl p-4 flex-row items-center justify-between active:bg-gray-50 my-4'
-          >
-            <View className='flex-row items-center'>
-              <Text className='text-lg mr-3'>📅</Text>
-              <Text className='text-lg text-gray-800'>
-                {selectedDate.toLocaleDateString('nl-NL', {
-                  weekday: 'long',
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                })}
+          {/*reset zoeken functie*/}
+          {(startLocation !== null || endLocation !== null) && (
+            <View className='px-4 pt-4 flex-row justify-end w-full'>
+              <Text className='text-blue-600 underline' onPress={resetFilters}>
+                Reset
               </Text>
             </View>
-            <Text className='text-blue-600 font-semibold'>Wijzigen</Text>
-          </Pressable>
-
-          {/* Modal for iOS */}
-          <ScrollView>
-            {Platform.OS === 'ios' && showPicker && (
-              <Modal
-                visible={showPicker}
-                transparent
-                animationType='slide'
-                onRequestClose={() => setShowPicker(false)}
-              >
-                <View className='flex-1 justify-end bg-black/50'>
-                  <View className='bg-white rounded-t-3xl p-6 max-h-3/4'>
-                    <View className='flex-row justify-between items-center mb-6'>
-                      <Text className='text-xl font-bold text-gray-800'>
-                        Selecteer datum
-                      </Text>
-                      <Pressable
-                        onPress={() => setShowPicker(false)}
-                        className='w-8 h-8 items-center justify-center'
-                      >
-                        <Text className='text-2xl text-gray-400'>×</Text>
-                      </Pressable>
-                    </View>
-
-                    <DateTimePicker
-                      value={selectedDate}
-                      mode={mode}
-                      display='spinner'
-                      onChange={handleChange}
-                      locale='nl-NL'
-                    />
-
-                    <View className='flex-row gap-3 mt-6'>
-                      <Pressable
-                        onPress={() => setShowPicker(false)}
-                        className='flex-1 border border-gray-300 rounded-xl py-4'
-                      >
-                        <Text className='text-center text-gray-600 font-medium'>
-                          Annuleren
-                        </Text>
-                      </Pressable>
-                      <Pressable
-                        onPress={() => setShowPicker(false)}
-                        className='flex-1 bg-blue-500 rounded-xl py-4'
-                      >
-                        <Text className='text-center text-white font-medium'>
-                          Bevestigen
-                        </Text>
-                      </Pressable>
-                    </View>
-                  </View>
-                </View>
-              </Modal>
-            )}
-
-            {/* Android inline picker */}
-            {Platform.OS === 'android' && showPicker && (
-              <DateTimePicker
-                value={selectedDate}
-                mode={mode}
-                display='default'
-                onChange={handleChange}
-                locale='nl-NL'
-              />
-            )}
-
-            {/* Cards voorbeeld */}
-            <View className='mt-5'>
-              <CarpoolCard
-                time={''} 
-                startLocation={'Assen'}
-                endLocation={'groningen'}
-                avatar={'image'}
+          )}
+          
+          {/* Zoeken functie */}
+          <View className='flex-row justify-between my-2 w-full'>
+            <View className='w-1/2 pr-2'>
+              <Text className='text-lg font-semibold text-gray-700 mb-2 py'>
+                Vertrekpunt
+              </Text>
+              <AutoCompleteLocation
+                value={startLocation?.displayName ?? ''}
+                onSelect={(feature) => handleLocationData(setStartLocation, feature)
+                }
+                placeholder='Bijv. Groningen...'
               />
             </View>
-          </ScrollView>
+            <View className='w-1/2 pl-2'>
+              <Text className='text-lg font-semibold text-gray-700 mb-2'>
+                Bestemming
+              </Text>
+              <AutoCompleteLocation
+                value={endLocation?.displayName ?? ''}
+                onSelect={(feature) => 
+                  handleLocationData(setEndLocation, feature)
+                }
+                placeholder='Bijv. Assen...'
+              />
+            </View>
+          </View>
+
+          {/* Datum Pikker */}
+          <DatePickerField
+            value={selectedDate}
+            onChange={setSelectedDate}
+          />
+          {error && (<Text>{error}</Text>)}
+
+          <CarpoolList selectedDate={selectedDate} selectedStartLocation={startLocation} selectedEndLocation={endLocation} />
         </Card>
       </View>
     </SafeAreaView>
