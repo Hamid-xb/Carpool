@@ -1,8 +1,17 @@
+import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { useSession } from '@/context/session-context';
 import { getUserRides } from '@/libs/getUserRides';
 import { CarpoolCard } from './CarpoolCard';
+import { router } from 'expo-router';
+
+// Define your stack param list
+type RootStackParamList = {
+  showCarpool: undefined;
+  // add other screens if needed
+};
 
 type Ride = {
   id: string;
@@ -21,7 +30,11 @@ type Props = {
   selectedDate: Date;
 };
 
-export function CarpoolList({ selectedDate, selectedStartLocation, selectedEndLocation }: Props) {
+export function CarpoolList({
+  selectedDate,
+  selectedStartLocation,
+  selectedEndLocation,
+}: Props) {
   const [rides, setRides] = useState<Ride[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -75,10 +88,14 @@ export function CarpoolList({ selectedDate, selectedStartLocation, selectedEndLo
       {loading && <Text>Loading...</Text>}
 
       {rides
-        .sort((a, b) => new Date(b.dateTime).valueOf() - new Date(a.dateTime).valueOf())
+        .sort(
+          (a, b) =>
+            new Date(b.dateTime).valueOf() - new Date(a.dateTime).valueOf(),
+        )
         .filter((ride) => {
           const sameDate =
-            ride.dateTime.slice(0, 10) === selectedDate.toISOString().slice(0, 10);
+            ride.dateTime.slice(0, 10) ===
+            selectedDate.toISOString().slice(0, 10);
 
           const sameStart =
             !selectedStartLocation ||
@@ -91,15 +108,15 @@ export function CarpoolList({ selectedDate, selectedStartLocation, selectedEndLo
           return sameDate && sameStart && sameEnd;
         })
         .map((ride) => (
-          <View className="mt-5 bg-white" key={ride.id}>
-            <CarpoolCard
+          <View className='mt-5 bg-white' key={ride.id}>
+            <CarpoolCard 
               time={formatRideDate(ride.dateTime)}
               startLocation={ride.fromLocation}
               endLocation={ride.toLocation}
               avatar={ride.avatarUrl}
             />
           </View>
-      ))}
+        ))}
     </View>
   );
 }
