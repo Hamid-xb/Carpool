@@ -105,76 +105,86 @@ export default function drive() {
 
   return (
     <SafeAreaView className='flex-1'>
-        <View className='flex-1 m-3 bg-gray-400 p-0 rounded'>
-          <Card className='bg-gray-500 m-0'>
+      <View className='flex-1 bg-gray-100 w-full mx-auto'>
+        <View className='pb-6'>
+          <Text className='text-3xl font-bold text-gray-800 mx-auto'>
+            Mijn Carpools
+          </Text>
+        </View>
+
+        {/* Main Card */}
+        <Card className='flex-1 rounded-2xl shadow-lg bg-[#9ca3af] border-0 mx-4 mb-4'>
+          <View>
             {hasCar ? (
-              <Button size='lg' onPress={handleCreateCarpool}>
+              <Button size='lg' onPress={handleCreateCarpool} className='rounded-xl'>
                 <ButtonIcon as={Plus} />
                 <ButtonText>Maak een Carpool aan</ButtonText>
               </Button>
+              ) : (
+                <Popover
+                  isOpen={isOpen}
+                  onClose={handleClose}
+                  onOpen={handleOpen}
+                  placement='bottom'
+                  size='md'
+                  trigger={(triggerProps) => {
+                    return (
+                      <Button size='lg' {...triggerProps}>
+                        <ButtonIcon as={Plus} />
+                        <ButtonText>Maak een Carpool aan</ButtonText>
+                      </Button>
+                    );
+                  }}
+                >
+                  <PopoverBackdrop />
+                  <PopoverContent>
+                    <PopoverArrow />
+                    <PopoverBody>
+                      <Text className='text-typography-900'>
+                        Je moet eerst een auto toevoegen voordat je een carpool
+                        kunt aanmaken.
+                      </Text>
+                    </PopoverBody>
+                  </PopoverContent>
+                </Popover>
+              )}
+            </View>
+
+            {loading ? (
+              <View className='flex-1 justify-center items-center'>
+                <Spinner size='large' />
+              </View>
+            ) : rides.length > 0 ? (
+              <ScrollView>
+                {rides
+                  .sort((a, b) => {
+                    const dateA = new Date(`${a.dateTime}`).valueOf();
+                    const dateB = new Date(`${b.dateTime}`).valueOf();
+                    if (dateA > dateB) {
+                      return -1; // return -1 here for DESC order
+                    }
+                    return 1; // return 1 here for DESC Order
+                  })
+                  .map((ride) => (
+                    <View className='mt-5' key={ride.id}>
+                      <CarpoolCard
+                        time={formatRideDate(ride.dateTime)}
+                        startLocation={ride.fromLocation}
+                        endLocation={ride.toLocation}
+                        avatar={ride.avatarUrl}
+                        onPress={() => router.push('showCarpool', { rideId: ride.id })}
+                      />
+                    </View>
+                ))}
+              </ScrollView>
             ) : (
-              <Popover
-                isOpen={isOpen}
-                onClose={handleClose}
-                onOpen={handleOpen}
-                placement='bottom'
-                size='md'
-                trigger={(triggerProps) => {
-                  return (
-                    <Button size='lg' {...triggerProps}>
-                      <ButtonIcon as={Plus} />
-                      <ButtonText>Maak een Carpool aan</ButtonText>
-                    </Button>
-                  );
-                }}
-              >
-                <PopoverBackdrop />
-                <PopoverContent>
-                  <PopoverArrow />
-                  <PopoverBody>
-                    <Text className='text-typography-900'>
-                      Je moet eerst een auto toevoegen voordat je een carpool
-                      kunt aanmaken.
-                    </Text>
-                  </PopoverBody>
-                </PopoverContent>
-              </Popover>
+              <View className='flex-1 justify-center items-center'>
+                <Text size='xl' bold>
+                  Maak nu een carpool aan!
+                </Text>
+              </View>
             )}
           </Card>
-
-          {loading ? (
-            <View className='flex-1 justify-center items-center'>
-              <Spinner size='large' />
-            </View>
-          ) : rides.length > 0 ? (
-            <ScrollView className='p-3'>
-              {rides
-                .sort((a, b) => {
-                  const dateA = new Date(`${a.dateTime}`).valueOf();
-                  const dateB = new Date(`${b.dateTime}`).valueOf();
-                  if (dateA > dateB) {
-                    return -1; // return -1 here for DESC order
-                  }
-                  return 1; // return 1 here for DESC Order
-                })
-                .map((ride) => (
-                  <View className='mt-5' key={ride.id}>
-                    <CarpoolCard
-                      time={formatRideDate(ride.dateTime)}
-                      startLocation={ride.fromLocation}
-                      endLocation={ride.toLocation}
-                      avatar={ride.avatarUrl}
-                    />
-                  </View>
-              ))}
-            </ScrollView>
-          ) : (
-            <View className='flex-1 justify-center items-center'>
-              <Text size='xl' bold>
-                Maak nu een carpool aan!
-              </Text>
-            </View>
-          )}
         </View>
     </SafeAreaView>
   );

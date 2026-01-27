@@ -66,7 +66,7 @@ export default function ExploreScreen() {
           )}
           
           {/* Zoeken functie */}
-          <View className='flex-row justify-between my-2 w-full'>
+          <View className='flex-row justify-between w-full'>
             <View className='w-1/2 pr-2'>
               <Text className='text-lg font-semibold text-gray-700 mb-2 py'>
                 Vertrekpunt

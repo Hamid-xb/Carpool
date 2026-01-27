@@ -1,5 +1,4 @@
 import { useNavigation } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { useSession } from '@/context/session-context';
@@ -37,6 +36,7 @@ export function CarpoolList({
 }: Props) {
   const [rides, setRides] = useState<Ride[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
   const session = useSession();
   const userId = session.user.id;
@@ -108,12 +108,13 @@ export function CarpoolList({
           return sameDate && sameStart && sameEnd;
         })
         .map((ride) => (
-          <View className='mt-5 bg-white' key={ride.id}>
+          <View className='mt-5 bg-white rounded-xl' key={ride.id}>
             <CarpoolCard 
               time={formatRideDate(ride.dateTime)}
               startLocation={ride.fromLocation}
               endLocation={ride.toLocation}
               avatar={ride.avatarUrl}
+              onPress={() => navigation.navigate('showCarpool', { rideId: ride.id })}
             />
           </View>
         ))}

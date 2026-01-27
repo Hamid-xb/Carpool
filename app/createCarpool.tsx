@@ -1,5 +1,5 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { router } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, ScrollView } from 'react-native';
 import { AutoCompleteLocation } from '@/components/AutoCompleteLocation';
@@ -299,6 +299,8 @@ export default function CreateCarpool() {
   };
 
   return (
+    <>
+      <Stack.Screen options={{ headerShown: true, title: 'Carpool Aanmaken' }} />
       <View className='flex-1'>
         {renderContent()}
 
@@ -324,5 +326,6 @@ export default function CreateCarpool() {
           )}
         </View>
       </View>
+    </>
   );
 }
