@@ -2,14 +2,11 @@ import { useEffect, useState } from 'react';
 import {
   Alert,
   View,
-  SafeAreaView,
-  ScrollView,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Platform,
-  Keyboard,
   Text
 } from 'react-native';
+
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+
 import { useSession } from '@/context/session-context';
 import { getSupabaseClient } from '@/context/supabase';
 import { getSingleRecord } from '@/libs/getSingleRecord';
@@ -191,14 +188,13 @@ export default function EditProfile() {
 
   return (
 
-        <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
-          <ScrollView contentContainerStyle={{ paddingBottom: 60}}>
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-              <View>
-
-
+      <KeyboardAwareScrollView
+          contentContainerStyle={{ paddingBottom: 80 }}
+          enableOnAndroid
+          keyboardShouldPersistTaps="handled"
+          extraScrollHeight={20}
+      >
+          <View className="flex-1">
             <View className="justify-center items-center pb-10 pt-5">
               <UserAvatar
                   size={200}
@@ -209,100 +205,83 @@ export default function EditProfile() {
               />
             </View>
 
-            <View className='mb-6 space-y-2 px-4'>
+            <View className="mb-6 space-y-2 px-4">
               {profile.map(({ isdisabled, placeholder, value, setter }, i) => (
                   <View key={i}>
-                  <Text>
-                    {placeholder}
-                  </Text>
-                <Input
-                    variant='outline'
-                    size='md'
-                    isDisabled={isdisabled}
-                    className='bg-white rounded-md border border-gray-300 px-3 py-2 mb-2'
-                >
-                    <InputField
-                        value={value}
-                        onChangeText={setter}
-                    />
-                  </Input>
-
+                    <Text>{placeholder}</Text>
+                    <Input
+                        variant="outline"
+                        size="md"
+                        isDisabled={isdisabled}
+                        className="bg-white rounded-md border border-gray-300 px-3 py-2 mb-2"
+                    >
+                      <InputField value={value} onChangeText={setter} />
+                    </Input>
                   </View>
               ))}
             </View>
 
-            <View className='mb-6 space-y-2 px-4'>
+            <View className="mb-6 space-y-2 px-4">
               {car.map(({ isdisabled, placeholder, value, setter }, i) => {
-                if(placeholder != "Seats")
+                if (placeholder !== 'Seats') {
                   return (
                       <View key={i}>
-                      <Text>
-                        {placeholder}
-                      </Text>
-                      <Input
-                          variant='outline'
-                          size='md'
-                          isDisabled={isdisabled}
-                          className='bg-white rounded-md border border-gray-300 px-3 py-2 mb-2'
-                      >
-                        <InputField
-                            value={value !== null && value !== undefined ? String(value) : ''}
-                            onChangeText={setter}
-                            editable={isdisabled}
-                            keyboardType={placeholder === 'Seats' ? 'numeric' : 'default'}
-                            className='text-black'
-                        />
-                      </Input>
-                      </View>
-                  );
-                else
-                  return (
-                      <View key={i}>
-                        <Select
-                            selectedValue={value !== null ? String(value) : ""}
-                            onValueChange={(v) => setter(v)}
+                        <Text>{placeholder}</Text>
+                        <Input
+                            variant="outline"
+                            size="md"
+                            isDisabled={isdisabled}
+                            className="bg-white rounded-md border border-gray-300 px-3 py-2 mb-2"
                         >
-                          <SelectTrigger
-                              variant='outline'
-                              size='md'
-                              className='bg-white rounded-md border border-gray-300 px-3 py-2 mb-2'
-                          >
-                            <SelectInput placeholder={placeholder} />
-                            <SelectIcon className='mr-3' as={ChevronDownIcon} />
-                          </SelectTrigger>
-
-                          <SelectPortal>
-                            <SelectBackdrop />
-                            <SelectContent>
-                              {placeholder === 'Seats' ? (
-                                  <>
-                                    <SelectItem label='1' value='1' />
-                                    <SelectItem label='2' value='2' />
-                                    <SelectItem label='3' value='3' />
-                                  </>
-                              ) : (
-                                  <SelectItem label='Default Option' value='0' />
-                              )}
-                            </SelectContent>
-                          </SelectPortal>
-                        </Select>
+                          <InputField
+                              value={value !== null && value !== undefined ? String(value) : ''}
+                              onChangeText={setter}
+                              className="text-black"
+                          />
+                        </Input>
                       </View>
                   );
+                }
+
+                return (
+                    <View key={i}>
+                      <Text>Seats</Text>
+                      <Select
+                          selectedValue={value !== null ? String(value) : ''}
+                          onValueChange={(v) => setter(Number(v))}
+                      >
+                        <SelectTrigger
+                            variant="outline"
+                            size="md"
+                            className="bg-white rounded-md border border-gray-300 px-3 py-2 mb-2"
+                        >
+                          <SelectInput placeholder="Seats" />
+                          <SelectIcon className="mr-3" as={ChevronDownIcon} />
+                        </SelectTrigger>
+
+                        <SelectPortal>
+                          <SelectBackdrop />
+                          <SelectContent>
+                            <SelectItem label="1" value="1" />
+                            <SelectItem label="2" value="2" />
+                            <SelectItem label="3" value="3" />
+                            <SelectItem label="4" value="4" />
+                            <SelectItem label="5" value="5" />
+                          </SelectContent>
+                        </SelectPortal>
+                      </Select>
+                    </View>
+                );
               })}
             </View>
 
-            <View className={"flex-row justify-center pb-10"}>
-              <View className={"mr-4"}>
-                <Button
-                    size="xl"
-                    action="positive"
-                    onPress={updateProfile}
-                    disabled={loading}
-                >
+            <View className="flex-row justify-center pb-10">
+              <View className="mr-4">
+                <Button size="xl" action="positive" onPress={updateProfile} disabled={loading}>
                   <ButtonText>{loading ? 'Loading ...' : 'Update'}</ButtonText>
                 </Button>
               </View>
-              <View className={"ml-4"}>
+              <View className="ml-4">
                 <Button
                     size="xl"
                     action="negative"
@@ -323,10 +302,7 @@ export default function EditProfile() {
                 </Button>
               </View>
             </View>
-            </View>
-          </TouchableWithoutFeedback>
-          </ScrollView>
-        </KeyboardAvoidingView>
-
+          </View>
+      </KeyboardAwareScrollView>
   );
 }
