@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text } from 'react-native';
+import {View, Text, Alert} from 'react-native';
 import { useSession } from '@/context/session-context';
 import { getSingleRecord } from '@/libs/getSingleRecord';
 import { getUserCars } from '@/libs/getUserCars';
@@ -7,6 +7,7 @@ import { showError } from '@/libs/showError';
 import UserAvatar from './UserAvatar';
 import { Button, ButtonText } from './ui/button';
 import { router } from 'expo-router';
+import {getSupabaseClient} from "@/context/supabase";
 
 export default function Profile() {
     const session = useSession();
@@ -135,10 +136,39 @@ export default function Profile() {
                         <Text className="text-base text-gray-600">Color</Text>
                         <Text className="text-lg font-medium mb-3">{color || "-"}</Text>
                     </View>
+                </View>
 
-                    <Button onPress={() => router.push('/editProfile')}>
+                <View className="flex-row justify-center pb-10">
+
+                <View className="ml-4">
+                    <Button
+                        size="xl"
+                        action="positive"
+                        onPress={() => router.push('/editProfile')}>
                         <ButtonText> Profiel aanpassen</ButtonText>
                     </Button>
+                </View>
+
+                <View className="ml-4">
+                    <Button
+                        size="xl"
+                        action="negative"
+                        onPress={async () => {
+                            if (devMode) {
+                                console.log('[DEV MODE] Sign out skipped');
+                                Alert.alert('Signed out! (dev mode)');
+                                return;
+                            }
+                            const supabase = getSupabaseClient();
+                            if (!supabase) return;
+
+                            await supabase.auth.signOut();
+                            router.replace('/');
+                        }}
+                    >
+                        <ButtonText>Sign out</ButtonText>
+                    </Button>
+                </View>
                 </View>
 
             </View>

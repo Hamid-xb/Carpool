@@ -59,8 +59,8 @@ export default function EditProfile() {
   const userId = session?.user?.id;
 
   useEffect(() => {
-    if (session?.user) fetchUserData();
-  }, [session]);
+    if (userId) fetchUserData();
+  }, [userId]);
 
   async function fetchUserData() {
     try {
@@ -113,7 +113,7 @@ export default function EditProfile() {
     setAvatarUrl(url);
 
     if (devMode) {
-      console.log('[DEV MODE] Avatar uploaded:', url);
+      console.log('[DEV MODE] Avatar uploaded:');
       Alert.alert('Avatar updated! (dev mode)');
       return;
     }
@@ -267,6 +267,9 @@ export default function EditProfile() {
                             <SelectItem label="3" value="3" />
                             <SelectItem label="4" value="4" />
                             <SelectItem label="5" value="5" />
+                            <SelectItem label="6" value="6" />
+                            <SelectItem label="7" value="7" />
+                            <SelectItem label="8" value="8" />
                           </SelectContent>
                         </SelectPortal>
                       </Select>
