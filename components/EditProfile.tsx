@@ -278,32 +278,10 @@ export default function EditProfile() {
               })}
             </View>
 
-            <View className="flex-row justify-center pb-10">
-              <View className="mr-4">
+            <View className="p-5">
                 <Button size="xl" action="positive" onPress={updateProfile} disabled={loading}>
                   <ButtonText>{loading ? 'Loading ...' : 'Update'}</ButtonText>
                 </Button>
-              </View>
-              <View className="ml-4">
-                <Button
-                    size="xl"
-                    action="negative"
-                    onPress={async () => {
-                      if (devMode) {
-                        console.log('[DEV MODE] Sign out skipped');
-                        Alert.alert('Signed out! (dev mode)');
-                        return;
-                      }
-                      const supabase = getSupabaseClient();
-                      if (!supabase) return;
-
-                      await supabase.auth.signOut();
-                      router.replace('/');
-                    }}
-                >
-                  <ButtonText>Sign out</ButtonText>
-                </Button>
-              </View>
             </View>
           </View>
       </KeyboardAwareScrollView>

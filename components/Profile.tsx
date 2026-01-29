@@ -138,39 +138,37 @@ export default function Profile() {
                     </View>
                 </View>
 
-                <View className="flex-row justify-center pb-10">
+                <View className="flex-row justify-center pb-10 ">
+                    <View className="basis-1/2 p-3">
+                        <Button
+                            size="lg"
+                            action="positive"
+                            onPress={() => router.push('/editProfile')}>
+                            <ButtonText> Profiel aanpassen</ButtonText>
+                        </Button>
+                    </View>
+                    <View className="basis-1/2 p-3">
+                        <Button
+                            size="lg"
+                            action="negative"
+                            onPress={async () => {
+                                if (devMode) {
+                                    console.log('[DEV MODE] Sign out skipped');
+                                    Alert.alert('Signed out! (dev mode)');
+                                    return;
+                                }
+                                const supabase = getSupabaseClient();
+                                if (!supabase) return;
 
-                <View className="ml-4">
-                    <Button
-                        size="xl"
-                        action="positive"
-                        onPress={() => router.push('/editProfile')}>
-                        <ButtonText> Profiel aanpassen</ButtonText>
-                    </Button>
+                                await supabase.auth.signOut();
+                                router.replace('/');
+                            }}
+                        >
+                            <ButtonText>Sign out</ButtonText>
+                        </Button>
+                    </View>
+
                 </View>
-
-                <View className="ml-4">
-                    <Button
-                        size="xl"
-                        action="negative"
-                        onPress={async () => {
-                            if (devMode) {
-                                console.log('[DEV MODE] Sign out skipped');
-                                Alert.alert('Signed out! (dev mode)');
-                                return;
-                            }
-                            const supabase = getSupabaseClient();
-                            if (!supabase) return;
-
-                            await supabase.auth.signOut();
-                            router.replace('/');
-                        }}
-                    >
-                        <ButtonText>Sign out</ButtonText>
-                    </Button>
-                </View>
-                </View>
-
             </View>
         </View>
     );
