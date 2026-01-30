@@ -9,9 +9,11 @@ interface Props {
   size: number;
   url: string | null;
   onUpload: (filePath: string) => void;
+  disabled: boolean;
+  showUploadButton?: boolean;
 }
 
-export default function UserAvatar({ url, size = 150, onUpload }: Props) {
+export default function UserAvatar({ url, size = 150, onUpload ,disabled = false, showUploadButton = false }: Props) {
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const avatarSize = { height: size, width: size };
@@ -33,8 +35,8 @@ export default function UserAvatar({ url, size = 150, onUpload }: Props) {
   async function downloadImage(path: string) {
     try {
       const { data, error } = await supabase!.storage
-        .from('avatars')
-        .download(path);
+          .from('avatars')
+          .download(path);
       if (error) throw error;
 
       const fr = new FileReader();
@@ -81,22 +83,22 @@ export default function UserAvatar({ url, size = 150, onUpload }: Props) {
       }
 
       const arraybuffer = await fetch(image.uri).then((res) =>
-        res.arrayBuffer(),
+          res.arrayBuffer(),
       );
       const fileExt = image.uri.split('.').pop()?.toLowerCase() ?? 'jpeg';
       const path = `${Date.now()}.${fileExt}`;
 
       const { data, error: uploadError } = await supabase!.storage
-        .from('avatars')
-        .upload(path, arraybuffer, {
-          contentType: image.mimeType ?? 'image/jpeg',
-        });
+          .from('avatars')
+          .upload(path, arraybuffer, {
+            contentType: image.mimeType ?? 'image/jpeg',
+          });
 
       if (uploadError) throw uploadError;
 
       const { data: publicUrlData } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(path);
+          .from('avatars')
+          .getPublicUrl(path);
 
       const publicUrl = publicUrlData.publicUrl;
       setAvatarUrl(publicUrl);
@@ -114,17 +116,19 @@ export default function UserAvatar({ url, size = 150, onUpload }: Props) {
   }
 
   return (
-    <View>
-      <Avatar size='md' style={avatarSize}>
-        <AvatarFallbackText>Avatar</AvatarFallbackText>
-        <AvatarImage source={avatarUrl ? { uri: avatarUrl } : undefined} />
-      </Avatar>
-
       <View>
-        <Button onPress={uploadAvatar} disabled={uploading}>
-          <ButtonText>{uploading ? 'Uploading ...' : 'Upload'}</ButtonText>
-        </Button>
+        <Avatar size='md' style={avatarSize}>
+          <AvatarFallbackText>Avatar</AvatarFallbackText>
+          <AvatarImage source={avatarUrl ? { uri: avatarUrl } : undefined} />
+        </Avatar>
+
+        {showUploadButton && (
+            <View className="p-6">
+              <Button onPress={uploadAvatar} disabled={uploading || disabled}>
+                <ButtonText>{uploading ? 'Uploading ...' : 'Upload'}</ButtonText>
+              </Button>
+            </View>
+        )}
       </View>
-    </View>
   );
 }
