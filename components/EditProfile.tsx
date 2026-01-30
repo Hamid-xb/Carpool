@@ -16,6 +16,9 @@ import { updateRecord } from '@/libs/updateRecord';
 import UserAvatar from './UserAvatar';
 import { Button, ButtonText } from './ui/button';
 import { Input, InputField } from './ui/input';
+import { router } from 'expo-router';
+
+
 
 import {
     Select,
@@ -167,6 +170,7 @@ export default function EditProfile() {
             showError(error);
         } finally {
             setLoading(false);
+            router.push("/profile")
         }
     };
 
