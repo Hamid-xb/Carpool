@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import {View, Text, Alert} from 'react-native';
+import { View, Text, Alert } from 'react-native';
 import { useSession } from '@/context/session-context';
 import { getSingleRecord } from '@/libs/getSingleRecord';
 import { getUserCars } from '@/libs/getUserCars';
@@ -7,7 +7,7 @@ import { showError } from '@/libs/showError';
 import UserAvatar from './UserAvatar';
 import { Button, ButtonText } from './ui/button';
 import { router } from 'expo-router';
-import {getSupabaseClient} from "@/context/supabase";
+import { getSupabaseClient } from "@/context/supabase";
 
 export default function Profile() {
     const session = useSession();
