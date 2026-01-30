@@ -114,7 +114,7 @@ export function CarpoolList({
               startLocation={ride.fromLocation}
               endLocation={ride.toLocation}
               avatar={ride.avatarUrl}
-              onPress={() => navigation.navigate('showCarpool', { rideId: ride.id })}
+              onPress={() => navigation.navigate('carpoolDetails', { rideId: ride.id })}
             />
           </View>
         ))}

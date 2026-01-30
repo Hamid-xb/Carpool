@@ -172,7 +172,7 @@ export default function drive() {
                         startLocation={ride.fromLocation}
                         endLocation={ride.toLocation}
                         avatar={ride.avatarUrl}
-                        onPress={() => router.push('showCarpool', { rideId: ride.id })}
+                        onPress={() => router.push('carpoolDetails', { rideId: ride.id })}
                       />
                     </View>
                 ))}
