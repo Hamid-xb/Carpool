@@ -4,9 +4,7 @@ import {
     View,
     Text
 } from 'react-native';
-
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-
 import { useSession } from '@/context/session-context';
 import { getSingleRecord } from '@/libs/getSingleRecord';
 import { getUserCars } from '@/libs/getUserCars';
