@@ -15,9 +15,6 @@ import UserAvatar from './UserAvatar';
 import { Button, ButtonText } from './ui/button';
 import { Input, InputField } from './ui/input';
 import { router } from 'expo-router';
-
-
-
 import {
     Select,
     SelectTrigger,

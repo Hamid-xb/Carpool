@@ -35,8 +35,8 @@ export default function UserAvatar({ url, size = 150, onUpload ,disabled = false
   async function downloadImage(path: string) {
     try {
       const { data, error } = await supabase!.storage
-          .from('avatars')
-          .download(path);
+        .from('avatars')
+        .download(path);
       if (error) throw error;
 
       const fr = new FileReader();
@@ -83,22 +83,22 @@ export default function UserAvatar({ url, size = 150, onUpload ,disabled = false
       }
 
       const arraybuffer = await fetch(image.uri).then((res) =>
-          res.arrayBuffer(),
+        res.arrayBuffer(),
       );
       const fileExt = image.uri.split('.').pop()?.toLowerCase() ?? 'jpeg';
       const path = `${Date.now()}.${fileExt}`;
 
       const { data, error: uploadError } = await supabase!.storage
-          .from('avatars')
-          .upload(path, arraybuffer, {
-            contentType: image.mimeType ?? 'image/jpeg',
-          });
+        .from('avatars')
+        .upload(path, arraybuffer, {
+          contentType: image.mimeType ?? 'image/jpeg',
+        });
 
       if (uploadError) throw uploadError;
 
       const { data: publicUrlData } = supabase.storage
-          .from('avatars')
-          .getPublicUrl(path);
+        .from('avatars')
+        .getPublicUrl(path);
 
       const publicUrl = publicUrlData.publicUrl;
       setAvatarUrl(publicUrl);

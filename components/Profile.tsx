@@ -166,7 +166,6 @@ export default function Profile() {
                             <ButtonText>Sign out</ButtonText>
                         </Button>
                     </View>
-
                 </View>
             </View>
         </View>
