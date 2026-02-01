@@ -9,9 +9,11 @@ interface Props {
   size: number;
   url: string | null;
   onUpload: (filePath: string) => void;
+  disabled: boolean;
+  showUploadButton?: boolean;
 }
 
-export default function UserAvatar({ url, size = 150, onUpload }: Props) {
+export default function UserAvatar({ url, size = 150, onUpload ,disabled = false, showUploadButton = false }: Props) {
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const avatarSize = { height: size, width: size };
@@ -114,17 +116,19 @@ export default function UserAvatar({ url, size = 150, onUpload }: Props) {
   }
 
   return (
-    <View>
-      <Avatar size='md' style={avatarSize}>
-        <AvatarFallbackText>Avatar</AvatarFallbackText>
-        <AvatarImage source={avatarUrl ? { uri: avatarUrl } : undefined} />
-      </Avatar>
-
       <View>
-        <Button onPress={uploadAvatar} disabled={uploading}>
-          <ButtonText>{uploading ? 'Uploading ...' : 'Upload'}</ButtonText>
-        </Button>
+        <Avatar size='md' style={avatarSize}>
+          <AvatarFallbackText>Avatar</AvatarFallbackText>
+          <AvatarImage source={avatarUrl ? { uri: avatarUrl } : undefined} />
+        </Avatar>
+
+        {showUploadButton && (
+            <View className="p-6">
+              <Button onPress={uploadAvatar} disabled={uploading || disabled}>
+                <ButtonText>{uploading ? 'Uploading ...' : 'Upload'}</ButtonText>
+              </Button>
+            </View>
+        )}
       </View>
-    </View>
   );
 }
