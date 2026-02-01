@@ -8,18 +8,6 @@ import { useLocalSearchParams } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 
 export default function CarpoolList() {
-  const params = useLocalSearchParams();
-  const [carpoolDetails, setCarpoolDetails] = useState([]);
-  
-  useEffect(() => {
-    getCarpoolDetails();
-  }, []);
-
-  async function getCarpoolDetails() {
-    const { data } = await supabase.from('rides').select();
-  }
-
-
   return (
     <>
       <Stack.Screen options={{ headerShown: true, title: 'carpoolgegevens' }} />
